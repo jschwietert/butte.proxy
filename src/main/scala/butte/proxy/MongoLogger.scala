@@ -4,17 +4,20 @@ import akka.actor.Actor
 import butte.proxy.data.{ Log, Message }
 import reactivemongo.api.DefaultDB
 import data.JsonFormats._
+import reactivemongo.api.collections.default.BSONCollection
+import reactivemongo.bson.BSONDocument
 
 class MongoLogger(db: DefaultDB) extends Actor {
-  val collection = db.collection("log")
+  val collection = db[BSONCollection]("log")
 
   def receive = {
     // Insert
     case l: Log if l.opResult.isEmpty =>
-//      collection.insert()
+      collection.insert(l)
 
     // Update
     case l: Log =>
-//      collection.update(Json.obj("lastName" -> lastName))
+      val selector = BSONDocument("date" -> l.date.getMillis)
+      collection.update(selector, l)
   }
 }
