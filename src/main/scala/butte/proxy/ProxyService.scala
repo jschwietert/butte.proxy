@@ -5,15 +5,16 @@ import java.util.concurrent.TimeUnit
 import akka.actor.{ Actor, ActorRef }
 import akka.pattern.ask
 import akka.util.Timeout
-import butte.proxy.data.Message
+import butte.proxy.data.{ Result, Log, Message }
 import butte.proxy.data.MessageJsonSupport._
-import spray.http.{ HttpResponse, StatusCodes }
+import org.joda.time.{ DateTimeZone, DateTime }
+import spray.http.{ RemoteAddress, HttpResponse, StatusCodes }
 import spray.routing.HttpService
 
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
-class ProxyServiceActor(twitterClient: ActorRef) extends Actor with ProxyService {
+class ProxyServiceActor(logger: ActorRef, twitterClient: ActorRef) extends Actor with ProxyService {
   implicit val timeout = Timeout.apply(5, TimeUnit.SECONDS)
 
   implicit def system = actorRefFactory.system
@@ -32,12 +33,18 @@ class ProxyServiceActor(twitterClient: ActorRef) extends Actor with ProxyService
     }
   }
 
-  def postToTwitter(message: Message): Future[HttpResponse] = {
+  def postToTwitter(clientIp: RemoteAddress, message: Message): Future[HttpResponse] = {
+    val log = Log(DateTime.now(DateTimeZone.UTC), clientIp.toString, message)
+    logger ! log
+
     val f = twitterClient ? message
     f.mapTo[TwitterPostResult] map {
       case TwitterPostSuccess =>
+        logger ! log.copy(opResult = Some(Result("Success")))
         HttpResponse(StatusCodes.OK, "OK")
+
       case TwitterPostFailure(msg) =>
+        logger ! log.copy(opResult = Some(Result(s"Failure: $msg")))
         HttpResponse(StatusCodes.InternalServerError, msg)
     }
   }
@@ -56,8 +63,10 @@ trait ProxyService extends HttpService {
     path("publish") {
       post {
         entity(as[Message]) { message =>
-          complete {
-            postToTwitter(message)
+          clientIP { ip =>
+            complete {
+              postToTwitter(ip, message)
+            }
           }
         }
       }
@@ -83,7 +92,7 @@ trait ProxyService extends HttpService {
 
   def test: Future[HttpResponse]
 
-  def postToTwitter(message: Message): Future[HttpResponse]
+  def postToTwitter(clientIp: RemoteAddress, message: Message): Future[HttpResponse]
 
   def stopAfter(delay: FiniteDuration): Unit
 }

@@ -7,20 +7,16 @@ import spray.can.Http
 object Runner extends App {
   implicit val system = ActorSystem("butte-proxy")
 
-<<<<<<< HEAD
-  val MongoHosts = List("localhost")
+  val MongoHosts = List("192.168.1.224")
   val BindIP = "0.0.0.0"
   val BindPort = 8080
 
   val db = connect()
 
   val logger = system.actorOf(Props(classOf[MongoLogger], db), "mongo-logger")
-  val service = system.actorOf(Props[ProxyServiceActor], "proxy-service")
-=======
+  //  val logger = system.actorOf(Props(classOf[StdoutLogger]), "stdout-logger")
   val twitterClient = system.actorOf(Props[TwitterClient], "twitter-client")
-
-  val service = system.actorOf(Props(classOf[ProxyServiceActor], twitterClient), "proxy-service")
->>>>>>> master
+  val service = system.actorOf(Props(classOf[ProxyServiceActor], logger, twitterClient), "proxy-service")
 
   IO(Http) ! Http.Bind(service, BindIP, port = BindPort)
 
@@ -30,7 +26,7 @@ object Runner extends App {
 
     // gets an instance of the driver
     // (creates an actor system)
-    val driver = new MongoDriver
+    val driver = MongoDriver(system)
     val connection = driver.connection(MongoHosts)
 
     // Gets a reference to the database

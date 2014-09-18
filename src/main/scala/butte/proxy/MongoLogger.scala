@@ -7,16 +7,24 @@ import data.BsonFormats._
 import reactivemongo.api.collections.default.BSONCollection
 import reactivemongo.bson.BSONDocument
 
+import scala.concurrent.ExecutionContext
+
 class MongoLogger(db: DefaultDB) extends Actor {
+  implicit val ec: ExecutionContext = context.system.dispatcher
+
   val collection = db[BSONCollection]("log")
 
   def receive = {
     // Insert
     case l: Log if l.opResult.isEmpty =>
+      println(l)
+
       collection.insert(l)
 
     // Update
     case l: Log =>
+      println(l)
+
       val selector = BSONDocument("date" -> l.date.getMillis)
       collection.update(selector, l)
   }
