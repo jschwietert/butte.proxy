@@ -3,7 +3,7 @@ package butte.proxy.data
 import org.joda.time.{ DateTime, DateTimeZone }
 import reactivemongo.bson._
 
-object JsonFormats {
+object BsonFormats {
 
   implicit object PersonReader extends BSONDocumentReader[Log] {
     def read(doc: BSONDocument): Log = {

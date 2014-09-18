@@ -3,7 +3,7 @@ package butte.proxy
 import akka.actor.Actor
 import butte.proxy.data.{ Log, Message }
 import reactivemongo.api.DefaultDB
-import data.JsonFormats._
+import data.BsonFormats._
 import reactivemongo.api.collections.default.BSONCollection
 import reactivemongo.bson.BSONDocument
 
