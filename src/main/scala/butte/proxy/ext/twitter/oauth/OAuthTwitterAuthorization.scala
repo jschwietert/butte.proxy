@@ -9,7 +9,9 @@ import spray.http.HttpRequest
 import scala.io.Source
 
 trait OAuthTwitterAuthorization extends TwitterAuthorization {
+
   import butte.proxy.ext.twitter.oauth.OAuth._
+
   val home = System.getProperty("user.home")
   val lines = Source.fromFile(s"$home/.twitter/butte-proxy").getLines().toList
   val consumer = Consumer(lines(0), lines(1))
