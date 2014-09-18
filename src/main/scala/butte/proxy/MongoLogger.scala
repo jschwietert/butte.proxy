@@ -19,13 +19,17 @@ class MongoLogger(db: DefaultDB) extends Actor {
     case l: Log if l.opResult.isEmpty =>
       println(l)
 
-      collection.insert(l)
+      collection.insert(l) onFailure {
+        case t => println(s"Failed to insert log in mongo: $l  Error: $t")
+      }
 
     // Update
     case l: Log =>
       println(l)
 
       val selector = BSONDocument("date" -> l.date.getMillis)
-      collection.update(selector, l)
+      collection.update(selector, l) onFailure {
+        case t => println(s"Failed to update log in mongo: $l  Error: $t")
+      }
   }
 }
