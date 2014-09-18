@@ -16,4 +16,6 @@ libraryDependencies += "io.spray" %% "spray-routing" % "1.3.1"
 
 libraryDependencies += "io.spray" %% "spray-httpx" % "1.3.1"
 
+libraryDependencies += "io.spray" %% "spray-client" % "1.3.1"
+
 libraryDependencies += "io.spray" %% "spray-json" % "1.2.6"

@@ -3,17 +3,17 @@
 
 package butte.proxy.ext.twitter.oauth
 
-import javax.crypto
+import java.net.{ URLDecoder, URLEncoder }
 import java.nio.charset.Charset
-import spray.http.{ HttpEntity, MediaTypes, ContentType, HttpRequest }
-import spray.http.HttpHeaders.RawHeader
+import javax.crypto
+
 import org.parboiled.common.Base64
+import spray.http.HttpHeaders.RawHeader
+import spray.http.{ ContentType, HttpEntity, HttpRequest, MediaTypes }
+
 import scala.collection.immutable.TreeMap
-import java.net.URLEncoder
 
 object OAuth {
-  case class Consumer(key: String, secret: String)
-  case class Token(value: String, secret: String)
 
   def oAuthAuthorizer(consumer: Consumer, token: Token): HttpRequest => HttpRequest = {
     // construct the key and cryptographic entity
@@ -33,7 +33,7 @@ object OAuth {
           val params = data.asString.split("&")
           val pairs = params.map { param =>
             val p = param.split("=")
-            p(0) -> percentEncode(p(1))
+            URLDecoder.decode(p(0), "UTF-8") -> percentEncode(URLDecoder.decode(p(1), "UTF-8"))
           }
           (pairs.toMap, HttpEntity(ContentType(MediaTypes.`application/x-www-form-urlencoded`), "%s=%s" format (pairs(0)._1, pairs(0)._2)))
         case e => (Map(), e)
@@ -66,8 +66,14 @@ object OAuth {
     }
   }
 
-  private def percentEncode(str: String): String = URLEncoder.encode(str, "UTF-8") replace ("+", "%20") replace ("%7E", "~")
   private def percentEncode(s: Seq[String]): String = s map percentEncode mkString "&"
+
+  private def percentEncode(str: String): String = URLEncoder.encode(str, "UTF-8") replace ("+", "%20") replace ("%7E", "~")
+
   private def bytes(str: String) = str.getBytes(Charset.forName("UTF-8"))
+
+  case class Consumer(key: String, secret: String)
+
+  case class Token(value: String, secret: String)
 
 }

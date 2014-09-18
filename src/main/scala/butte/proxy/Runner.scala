@@ -7,7 +7,9 @@ import spray.can.Http
 object Runner extends App {
   implicit val system = ActorSystem("butte-proxy")
 
-  val service = system.actorOf(Props[ProxyServiceActor], "proxy-service")
+  val twitterClient = system.actorOf(Props[TwitterClient], "twitter-client")
+
+  val service = system.actorOf(Props(classOf[ProxyServiceActor], twitterClient), "proxy-service")
 
   IO(Http) ! Http.Bind(service, "0.0.0.0", port = 8080)
 }
