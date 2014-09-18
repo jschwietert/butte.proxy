@@ -7,6 +7,7 @@ import spray.can.Http
 object Runner extends App {
   implicit val system = ActorSystem("butte-proxy")
 
+<<<<<<< HEAD
   val MongoHosts = List("localhost")
   val BindIP = "0.0.0.0"
   val BindPort = 8080
@@ -15,6 +16,11 @@ object Runner extends App {
 
   val logger = system.actorOf(Props(classOf[MongoLogger], db), "mongo-logger")
   val service = system.actorOf(Props[ProxyServiceActor], "proxy-service")
+=======
+  val twitterClient = system.actorOf(Props[TwitterClient], "twitter-client")
+
+  val service = system.actorOf(Props(classOf[ProxyServiceActor], twitterClient), "proxy-service")
+>>>>>>> master
 
   IO(Http) ! Http.Bind(service, BindIP, port = BindPort)
 
