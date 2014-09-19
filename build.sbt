@@ -10,6 +10,8 @@ resolvers += "spray repo" at "http://repo.spray.io"
 
 resolvers += "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
 
+scalacOptions ++= Seq("-feature")
+
 libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.3.2"
 
 libraryDependencies += "io.spray" %% "spray-can" % "1.3.1"
