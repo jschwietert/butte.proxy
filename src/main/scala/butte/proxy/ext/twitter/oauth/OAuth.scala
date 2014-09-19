@@ -36,7 +36,7 @@ object OAuth {
             URLDecoder.decode(p(0), "UTF-8") -> percentEncode(URLDecoder.decode(p(1), "UTF-8"))
           }
           (pairs.toMap, HttpEntity(ContentType(MediaTypes.`application/x-www-form-urlencoded`), "%s=%s" format (pairs(0)._1, pairs(0)._2)))
-        case e => (Map(), e)
+        case e => (Map[String, String](), e)
       }
 
       // prepare the OAuth parameters
