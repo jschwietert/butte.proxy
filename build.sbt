@@ -12,6 +12,8 @@ resolvers += "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositor
 
 scalacOptions ++= Seq("-feature")
 
+libraryDependencies += "com.typesafe" % "config" % "1.2.1"
+
 libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.3.2"
 
 libraryDependencies += "io.spray" %% "spray-can" % "1.3.1"
