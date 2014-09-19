@@ -48,7 +48,7 @@ class TwitterClient extends Actor {
   }
 
   private def postRequest(message: String): HttpRequest = {
-    val formData = FormData(Map("status" -> message))
+    val formData = FormData(Map("status" -> message.take(140)))
     val request = spray.client.pipelining.Post("https://api.twitter.com/1.1/statuses/update.json", formData)
     auth.authorize(request)
   }
